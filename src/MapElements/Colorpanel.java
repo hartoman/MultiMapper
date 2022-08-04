@@ -22,7 +22,7 @@ public class Colorpanel extends javax.swing.JPanel {
 
     private RandMap map;
     private boolean transparentGrid = false;
-    private boolean transparentBackground = false;
+//    private boolean transparentBackground = false;
 
     public Colorpanel(RandMap map) {
         this.map=map;
@@ -43,20 +43,20 @@ public class Colorpanel extends javax.swing.JPanel {
         g2d.setColor(Color.BLUE);
         g2d.fillRect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
 
-        ColorizeMap(transparentGrid, transparentBackground, map, g);
+        ColorizeMap(transparentGrid, map, g);
 
     }
 
     // sets a map in the Colorpanel. this method is used by the Mapper's loadMap
-    public void setMap(RandMap map, boolean transGrid, boolean transpBack) {
+    public void setMap(RandMap map, boolean transGrid) {
         this.map = map;
         transparentGrid = transGrid;
-        transparentBackground = transpBack;
+     //   transparentBackground = transpBack;
         removeAll();
     }
 
     // colorizes the entire map
-    public void ColorizeMap(boolean transparentGrid, boolean transparentBackground, RandMap map, Graphics g) {
+    public void ColorizeMap(boolean transparentGrid, RandMap map, Graphics g) {
         Color cellPerimeter = new Color(0f, 0f, 0f, 0f);
         Color background = new Color(0f, 0f, 0f, 0f);
 
@@ -68,7 +68,7 @@ public class Colorpanel extends javax.swing.JPanel {
         } else {
             cellPerimeter = new Color(0f, 0f, 0f, 1f);
         }
-        // if true the background is transparent, else color of the sea
+  /*      // if true the background is transparent, else color of the sea
         if (transparentBackground == true) {
             background = new Color(0, 180, 204, 0);
 
@@ -76,7 +76,7 @@ public class Colorpanel extends javax.swing.JPanel {
             background = map.getColorScheme().get(0);
             //background = new Color(0, 102, 204, 255);
         }
-        
+        */
         MapTile[][] maptiles = map.getMap();
         Polygon[][] polys = new Polygon[maptiles.length][maptiles.length];
 

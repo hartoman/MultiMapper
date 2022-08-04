@@ -207,7 +207,7 @@ class IslandMap extends RandMap {
     // sets the color scheme of the map
     protected void setColorScheme(){
         
-        colorScheme.put(0, new Color(0, 102, 204, 255));
+        colorScheme.put(0, new Color(0, 102, 204, 0));
         colorScheme.put(1, new Color(245, 239, 180));
         colorScheme.put(2, new Color(152, 133, 88));
         colorScheme.put(3, new Color(102, 204, 100));

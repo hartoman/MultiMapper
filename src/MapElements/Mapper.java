@@ -55,7 +55,7 @@ public class Mapper extends javax.swing.JFrame {
 
     private RandMap map;
     boolean transparentGrid = false;
-    boolean transparentBackground = false;
+  //  boolean transparentBackground = false;
 
     ///////////////////////////////////////////////////////////////////////
     public Mapper() {
@@ -205,7 +205,7 @@ public class Mapper extends javax.swing.JFrame {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
 
                     transparentGrid = false;
-                    loadMap(map, transparentGrid, transparentBackground);
+                    loadMap(map, transparentGrid);
                 }
             }
         });
@@ -218,7 +218,7 @@ public class Mapper extends javax.swing.JFrame {
                     transparentGrid = true;
                     panel.removeAll();
                     panel.updateUI();
-                    loadMap(map, transparentGrid, transparentBackground);
+                    loadMap(map, transparentGrid);
                 }
             }
         });
@@ -229,29 +229,29 @@ public class Mapper extends javax.swing.JFrame {
         lines.add(line2);
 
         //creates two radiobuttons and assigns them to the same buttongroup
-        transpPanel.add(new JLabel("Background Color"));
+        transpPanel.add(new JLabel("Create a new:"));
         transpPanel.add(new JSeparator());
-        JRadioButton back1 = new JRadioButton("Blue Sea", true);
+        JRadioButton back1 = new JRadioButton("Island", true);
         back1.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    transparentBackground = false;
+               //     transparentBackground = false;
                     // panel.removeAll();
                     //  panel.updateUI();
-                    loadMap(map, transparentGrid, transparentBackground);
+                //    loadMap(map, transparentGrid, transparentBackground);
                 }
             }
         });
         transpPanel.add(back1);
 
-        JRadioButton back2 = new JRadioButton("Transparent", false);
-        back2.addItemListener(new java.awt.event.ItemListener() {
+        JRadioButton back2 = new JRadioButton("Town", false);
+       back2.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    transparentBackground = true;
+            //        transparentBackground = true;
                     //    panel.removeAll();
                     //    panel.updateUI();
-                    loadMap(map, transparentGrid, transparentBackground);
+                //    loadMap(map, transparentGrid, transparentBackground);
 
                 }
             }
@@ -305,7 +305,7 @@ public class Mapper extends javax.swing.JFrame {
                 numPeaks.setText(String.valueOf(numPeaksValue));
 
                 map = new IslandMap(numSquares, distortion, inputPixels, maxElevationValue, numPeaksValue);
-                loadMap(map, transparentGrid, transparentBackground);
+                loadMap(map, transparentGrid);
             }
         });
         uiPane.add(createPanel);
@@ -481,13 +481,13 @@ public class Mapper extends javax.swing.JFrame {
         ArrayList<RandMap> map = new ArrayList<>();
         map = th.loader(map, fullfilename, RandMap.class);
         this.map = map.get(0);
-        loadMap(this.map, this.transparentGrid, this.transparentBackground);
+        loadMap(this.map, this.transparentGrid);
 
     }
 
-    public void loadMap(RandMap map, boolean transGrid, boolean transpBack) {
+    public void loadMap(RandMap map, boolean transGrid) {
         // sets the map, in the panel (method of Colorpanel)
-        this.panel.setMap(map, transGrid, transpBack);
+        this.panel.setMap(map, transGrid);
         //this.inputPixels = map.getPixelsPerSide();    REDUNDANT: map will always get fixed pixels per side based on screen height
     }
 
