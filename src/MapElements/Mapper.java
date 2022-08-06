@@ -81,6 +81,7 @@ public class Mapper extends javax.swing.JFrame {
 
         // creates the map panel
         panel = new Colorpanel(map);
+        
         panel.setLocation(panelX, panelY);
         
         panel.setSize((int) (inputPixels * 0.98), inputPixels);
@@ -107,13 +108,7 @@ public class Mapper extends javax.swing.JFrame {
     //  ACTION LISTENERS //
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    // menuitem Save as jpg
-    /*    // TODO: NEEDS A LOT OF ADJUSTMENT
-        // purpose is to dynamically resize everything based on map size
-        
-    private void MapComponentResized(java.awt.event.ComponentEvent evt) {
-            setSize((panel.getSize().width+uiPane.getSize().width), Math.max(panel.getSize().height, uipanelHeight));
-    }       */
+
     ////////////////////////////////////////////////////////////////////////////////////////
     // sets the global font size for the application
     public static void setUIFont(javax.swing.plaf.FontUIResource f) {
@@ -189,12 +184,13 @@ public class Mapper extends javax.swing.JFrame {
         transpPanel.setLayout(new BoxLayout(transpPanel, BoxLayout.PAGE_AXIS));
         transpPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
         transpPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        transpPanel.add(new JLabel("Map Transparencies"));
-        transpPanel.add(new JSeparator());
-        transpPanel.add(new JSeparator());
+      //  transpPanel.add(new JLabel("Map Transparencies"));
+      //  transpPanel.add(new JSeparator());
+      //  transpPanel.add(new JSeparator());
 
         //creates two radiobuttons and assigns them to the same buttongroup
         transpPanel.add(new JLabel("Grid Line Color"));
+        transpPanel.add(new JSeparator());
         transpPanel.add(new JSeparator());
         JRadioButton line1 = new JRadioButton("Black", true);
 
@@ -235,10 +231,7 @@ public class Mapper extends javax.swing.JFrame {
         back1.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-               //     transparentBackground = false;
-                    // panel.removeAll();
-                    //  panel.updateUI();
-                //    loadMap(map, transparentGrid, transparentBackground);
+
                 }
             }
         });
@@ -248,10 +241,7 @@ public class Mapper extends javax.swing.JFrame {
        back2.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-            //        transparentBackground = true;
-                    //    panel.removeAll();
-                    //    panel.updateUI();
-                //    loadMap(map, transparentGrid, transparentBackground);
+
 
                 }
             }
@@ -303,8 +293,13 @@ public class Mapper extends javax.swing.JFrame {
                 int maxPossiblePeaks = (map.getMap().length - (2 * maxElevationValue + 2)) * (map.getMap().length - (2 * maxElevationValue + 2));
                 int numPeaksValue = limitedInputRangeCorrecting(numPeaks.getText(), 1, maxPossiblePeaks, 5);
                 numPeaks.setText(String.valueOf(numPeaksValue));
-
-                map = new IslandMap(numSquares, distortion, inputPixels, maxElevationValue, numPeaksValue);
+                
+                if(back1.isSelected()){
+                    map = new IslandMap(numSquares, distortion, inputPixels, maxElevationValue, numPeaksValue);
+                }else{
+                    map = new TownMap(numSquares, distortion, inputPixels, maxElevationValue, numPeaksValue);
+                }
+                
                 loadMap(map, transparentGrid);
             }
         });

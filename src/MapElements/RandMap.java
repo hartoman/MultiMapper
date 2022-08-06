@@ -24,6 +24,11 @@ public abstract class RandMap {
 
     protected MapTile[][] maptile;
     protected Hashtable<Integer, Color> colorScheme = new Hashtable<>();
+    
+    
+    
+    protected Hashtable<Integer, String> textureScheme= new Hashtable<>();
+  //  protected String textureFolderPath;
 
     // maxDim = maximum dimensions of the map, distortion = deviation from angle
     public RandMap(int maxDim, int distortion, int sizeInPixels, int maxElevation, int maxPeaks) {
@@ -31,8 +36,9 @@ public abstract class RandMap {
         this.maptile = new MapTile[maxDim][maxDim];
 
         // sets the colorscheme hashtable
-        setColorScheme();
+      //  setColorScheme();
         
+        setTextureScheme();
         // creates the map grid
         createGrid(maxDim,distortion,sizeInPixels);
 
@@ -52,6 +58,10 @@ public abstract class RandMap {
     //returns the colorscheme
     public Hashtable<Integer, Color> getColorScheme() {
         return this.colorScheme;
+    }
+    
+    public Hashtable<Integer, String> getTextureScheme() {
+        return this.textureScheme;
     }
 
     // method for exporting the jpg/png without empty borders
@@ -142,6 +152,8 @@ public abstract class RandMap {
     }
     
     protected abstract void setColorScheme();
+    
+    protected abstract void setTextureScheme();
 
     protected abstract void setSeed(int maxDim, int maxElevation, int maxPeaks);
 
@@ -154,6 +166,7 @@ class IslandMap extends RandMap {
 
     public IslandMap(int maxDim, int distortion, int sizeInPixels, int maxElevation, int maxPeaks) {
         super(maxDim, distortion, sizeInPixels, maxElevation, maxPeaks);
+      //  textureFolderPath="IslandMap/";
         }
     
             // define place for each of the peaks
@@ -217,6 +230,20 @@ class IslandMap extends RandMap {
         colorScheme.put(7, new Color(204, 204, 204));
     };
     
+        // sets the texture scheme of the map
+    protected void setTextureScheme(){
+        
+        
+        
+        textureScheme.put(0, "water.jpg");
+        textureScheme.put(1, "light sand.jpg");
+        textureScheme.put(2, "dark sand.jpg");
+        textureScheme.put(3, "light jungle.jpg");
+        textureScheme.put(4, "medium jungle.jpg");
+        textureScheme.put(5, "dark jungle.jpg");
+        textureScheme.put(6, "dark rock.jpg");
+        textureScheme.put(7, "light rock.jpg");
+    };
     /*
         // sets the color scheme of the map
     protected void setColorScheme(){
@@ -233,4 +260,111 @@ class IslandMap extends RandMap {
     
     */
     
+}
+
+
+
+// maps for islands
+class TownMap extends RandMap {
+
+    public TownMap(int maxDim, int distortion, int sizeInPixels, int maxElevation, int maxPeaks) {
+        super(maxDim, distortion, sizeInPixels, maxElevation, maxPeaks);
+        }
+    
+            // define place for each of the peaks
+        @Override
+        public void setSeed(int maxDim, int maxElevation, int maxPeaks) {
+
+        for (int i = 0; i < maxPeaks; i++) {
+            Randomizer r = new Randomizer();
+
+            // acceptable random coordinates for the first tile, based on maximum elevation
+            // so that there is always sea at any border tile
+            int x = r.randomBetween(maxElevation + 1, maxDim - maxElevation - 1);
+            int y = r.randomBetween(maxElevation + 1, maxDim - maxElevation - 1);
+
+            // guarrantees that 1st peak will be at max elevation, while the rest will be more random
+            if (i == 0) {
+                setElevation(maxElevation, x, y);
+                setElevation(maxElevation, x+1,y);
+                setElevation(maxElevation, x,y+1);
+                setElevation(maxElevation, x+1,y+1);
+            } else {
+                setElevation(r.randomBetween(maxElevation / 2, maxElevation), x, y);
+            }
+        }/**/
+    }
+
+    /* sets elevation for the tiles */
+    public void setElevation(int maxElevation, int x, int y) {
+
+        Randomizer r = new Randomizer();
+        if (maxElevation > maptile[x][y].getElevation()) {
+            maptile[x][y].setElevation(maxElevation);
+        }
+
+        if (maxElevation > 0) {
+            boolean axis = r.randomBool();
+            // expands on the horizontal-vertical axis
+     //       if (axis == true) {
+               setElevation((maxElevation - 1), x + 1, y);
+                setElevation((maxElevation - 1), x - 1, y);
+                setElevation((maxElevation - 1), x, y + 1);
+                setElevation((maxElevation - 1), x, y - 1);
+          //  } else {
+                //expands on diagonal
+                setElevation((maxElevation - 1), x + 1, y + 1);
+                setElevation((maxElevation - 1), x - 1, y - 1);
+                setElevation((maxElevation - 1), x - 1, y + 1);
+                setElevation((maxElevation - 1), x + 1, y - 1);
+           // }
+        }/**/
+    }
+    
+    
+    // sets the color scheme of the map
+    protected void setColorScheme(){
+        
+      //  colorScheme.put(0, new Color(0, 102, 204, 0));
+        colorScheme.put(0, new Color(102, 204, 100));       //ligth green
+        colorScheme.put(2, new Color(92, 67, 55));          //dark brown
+    //    colorScheme.put(1, new Color(245, 239, 180));
+     //   colorScheme.put(1, new Color(152, 133, 88));        // light brown
+        colorScheme.put(3, new Color(102, 204, 100));
+        colorScheme.put(4, new Color(34, 139, 34));
+        colorScheme.put(5, new Color(0, 100, 0));
+        colorScheme.put(6, new Color(153, 153, 153));       
+        colorScheme.put(1, new Color(204, 204, 204));       // light gray
+        colorScheme.put(7, new Color(204, 204, 204));       // light gray
+    };
+    
+    /*
+        // sets the color scheme of the map
+    protected void setColorScheme(){
+        
+        colorScheme.put(0, Color.red);
+        colorScheme.put(1, Color.WHITE);
+        colorScheme.put(2, Color.LIGHT_GRAY);
+        colorScheme.put(3, Color.darkGray);
+        colorScheme.put(4, Color.black);
+        colorScheme.put(5, Color.pink);
+        colorScheme.put(6, Color.BLUE);
+        colorScheme.put(7, Color.YELLOW);
+    };
+    
+    */
+            // sets the texture scheme of the map
+    protected void setTextureScheme(){
+        
+        
+        
+        textureScheme.put(0, "water.jpg");
+        textureScheme.put(1, "light sand.jpg");
+        textureScheme.put(2, "dark sand.jpg");
+        textureScheme.put(3, "light jungle.jpg");
+        textureScheme.put(4, "medium jungle.jpg");
+        textureScheme.put(5, "dark jungle.jpg");
+        textureScheme.put(6, "light rock.jpg");
+        textureScheme.put(7, "dark rock.jpg");
+    };
 }
