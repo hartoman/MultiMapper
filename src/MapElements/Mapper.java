@@ -201,7 +201,7 @@ public class Mapper extends javax.swing.JFrame {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
 
                     transparentGrid = false;
-                    loadMap(map, transparentGrid);
+                   loadMap(map, transparentGrid);
                 }
             }
         });
@@ -211,6 +211,7 @@ public class Mapper extends javax.swing.JFrame {
         line2.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
+                    
                     transparentGrid = true;
                     panel.removeAll();
                     panel.updateUI();

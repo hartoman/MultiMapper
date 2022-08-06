@@ -32,12 +32,13 @@ public class Colorpanel extends javax.swing.JPanel {
     private RandMap map;
     private boolean transparentGrid = false;
 
-
     private Hashtable<Integer, TexturePaint> textureScheme = new Hashtable<>();
     private BufferedImage bi;
 
     public Colorpanel(RandMap map) {
         this.map = map;
+        // sets up the texture schema of the map
+        setTextures();
     }
 
     @Override
@@ -62,6 +63,7 @@ public class Colorpanel extends javax.swing.JPanel {
     // sets a map in the Colorpanel. this method is used by the Mapper's loadMap
     public void setMap(RandMap map, boolean transGrid) {
         this.map = map;
+        setTextures();
         transparentGrid = transGrid;
         removeAll();
     }
@@ -79,6 +81,7 @@ public class Colorpanel extends javax.swing.JPanel {
         } else {
             cellPerimeter = new Color(0f, 0f, 0f, 1f);
         }
+        
         /*      // if true the background is transparent, else color of the sea
         if (transparentBackground == true) {
             background = new Color(0, 180, 204, 0);
@@ -88,11 +91,11 @@ public class Colorpanel extends javax.swing.JPanel {
             //background = new Color(0, 102, 204, 255);
         }
          */
+        
         MapTile[][] maptiles = map.getMap();
         Polygon[][] polys = new Polygon[maptiles.length][maptiles.length];
 
-        // sets up the texture schema of the map
-        setTextures();
+        
 
         // loads up g2d and selects the first texture of the schema
         Graphics2D g2d = (Graphics2D) g.create();
@@ -150,7 +153,6 @@ public class Colorpanel extends javax.swing.JPanel {
         for (int i = 0; i < map.getTextureScheme().size(); i++) {
             String filename = map.getTextureScheme().get(i);
             String fullPath = "MapTextures/" + filename;
-            
 
             try {
                 URL url = getClass().getClassLoader().getResource(fullPath);

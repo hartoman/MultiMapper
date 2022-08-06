@@ -38,7 +38,9 @@ public abstract class RandMap {
         // sets the colorscheme hashtable
       //  setColorScheme();
         
+      // sets the texture scheme hashtable
         setTextureScheme();
+        
         // creates the map grid
         createGrid(maxDim,distortion,sizeInPixels);
 
@@ -358,7 +360,7 @@ class TownMap extends RandMap {
         
         
         
-        textureScheme.put(0, "water.jpg");
+        textureScheme.put(0, "water2.jpg");
         textureScheme.put(1, "light sand.jpg");
         textureScheme.put(2, "dark sand.jpg");
         textureScheme.put(3, "light jungle.jpg");
