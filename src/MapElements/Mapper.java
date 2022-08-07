@@ -54,12 +54,15 @@ public class Mapper extends javax.swing.JFrame {
     private final int panelY = 20;      // y where map and ui appear
 
     private RandMap map;
-    boolean transparentGrid = false;
-  //  boolean transparentBackground = false;
+    private boolean transparentGrid = false;
+
+    private final int maxPossibleElevationIsland = 7;
+    private final int maxPossibleElevationTown = 7;
+    //  boolean transparentBackground = false;
 
     ///////////////////////////////////////////////////////////////////////
     public Mapper() {
-        
+
         setUIFont(new javax.swing.plaf.FontUIResource("Serif", Font.PLAIN, 18));
 
         // so that everything is autoarranged in one row, 2 columns
@@ -67,27 +70,27 @@ public class Mapper extends javax.swing.JFrame {
         this.setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
         // define map parameters
-        squaresPerSide = 20;
-        distortion = 5;
-        maxElevationValue = 7;
-        numPeaksValue = 1;
+        squaresPerSide = 50;
+        distortion = 3;
+        maxElevationValue = 5;
+        numPeaksValue = 5;
 
         // gets the maximum screen height   -- the*0.92 is to adjust for lost screen space on linux
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         this.inputPixels = (int) (gd.getDisplayMode().getHeight() * 0.92);
 
         // creates map and visualizes it through the colorpanel
-        this.map = new IslandMap(squaresPerSide, distortion, inputPixels, maxElevationValue, numPeaksValue);
+        this.map = new TownMap(squaresPerSide, distortion, inputPixels, maxElevationValue, numPeaksValue);
 
         // creates the map panel
         panel = new Colorpanel(map);
-        
+
         panel.setLocation(panelX, panelY);
-        
+
         panel.setSize((int) (inputPixels * 0.98), inputPixels);
-        
+
         panel.setMinimumSize(new Dimension(inputPixels, inputPixels));
-        
+
         add(panel);
 
         //creates elements of the uiPanel
@@ -107,7 +110,6 @@ public class Mapper extends javax.swing.JFrame {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //  ACTION LISTENERS //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
 
     ////////////////////////////////////////////////////////////////////////////////////////
     // sets the global font size for the application
@@ -146,11 +148,11 @@ public class Mapper extends javax.swing.JFrame {
         mapParams.add(new JSeparator());
         mapParams.add(new JSeparator());
         mapParams.add(new JLabel("Number of Squares"));
-        JTextField squares = new JTextField("20");
+        JTextField squares = new JTextField("50");
         squares.setMaximumSize(new Dimension(100, 100));
         mapParams.add(squares);
         mapParams.add(new JLabel("Distortion"));
-        JTextField dist = new JTextField("5");
+        JTextField dist = new JTextField("3");
         dist.setMaximumSize(new Dimension(100, 100));
         mapParams.add(dist);
         uiPane.add(mapParams);
@@ -184,9 +186,9 @@ public class Mapper extends javax.swing.JFrame {
         transpPanel.setLayout(new BoxLayout(transpPanel, BoxLayout.PAGE_AXIS));
         transpPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
         transpPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-      //  transpPanel.add(new JLabel("Map Transparencies"));
-      //  transpPanel.add(new JSeparator());
-      //  transpPanel.add(new JSeparator());
+        //  transpPanel.add(new JLabel("Map Transparencies"));
+        //  transpPanel.add(new JSeparator());
+        //  transpPanel.add(new JSeparator());
 
         //creates two radiobuttons and assigns them to the same buttongroup
         transpPanel.add(new JLabel("Grid Line Color"));
@@ -201,7 +203,7 @@ public class Mapper extends javax.swing.JFrame {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
 
                     transparentGrid = false;
-                   loadMap(map, transparentGrid);
+                    loadMap(map, transparentGrid);
                 }
             }
         });
@@ -211,7 +213,7 @@ public class Mapper extends javax.swing.JFrame {
         line2.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    
+
                     transparentGrid = true;
                     panel.removeAll();
                     panel.updateUI();
@@ -239,10 +241,9 @@ public class Mapper extends javax.swing.JFrame {
         transpPanel.add(back1);
 
         JRadioButton back2 = new JRadioButton("Town", false);
-       back2.addItemListener(new java.awt.event.ItemListener() {
+        back2.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-
 
                 }
             }
@@ -280,27 +281,35 @@ public class Mapper extends javax.swing.JFrame {
                 panel.updateUI();
 
                 // in case the user asks for impossible stuff, this corrects the values to the normal
-                int numSquares = limitedInputRangeCorrecting(squares.getText(), 4, 100, 20);
+                int numSquares = limitedInputRangeCorrecting(squares.getText(), 4, 100, 50);
                 squares.setText(String.valueOf(numSquares));
 
                 //     int maxDist = (inputPixels / (2 * numSquares)) - 1;
                 int maxDist = (inputPixels / numSquares);
-                int distortion = limitedInputRangeCorrecting(dist.getText(), 0, maxDist, 0);
+                int distortion = limitedInputRangeCorrecting(dist.getText(), 0, maxDist, 2);
                 dist.setText(String.valueOf(distortion));
 
-                int maxElevationValue = limitedInputRangeCorrecting(maxElevation.getText(), 1, 7, 7);
-                maxElevation.setText(String.valueOf(maxElevationValue));
-
-                int maxPossiblePeaks = (map.getMap().length - (2 * maxElevationValue + 2)) * (map.getMap().length - (2 * maxElevationValue + 2));
-                int numPeaksValue = limitedInputRangeCorrecting(numPeaks.getText(), 1, maxPossiblePeaks, 5);
-                numPeaks.setText(String.valueOf(numPeaksValue));
-                
-                if(back1.isSelected()){
-                    map = new IslandMap(numSquares, distortion, inputPixels, maxElevationValue, numPeaksValue);
-                }else{
-                    map = new TownMap(numSquares, distortion, inputPixels, maxElevationValue, numPeaksValue);
+                int tmpMax;
+                if (back1.isSelected() == true) {
+                    tmpMax = maxPossibleElevationIsland;
+                } else {
+                    tmpMax = maxPossibleElevationTown;
                 }
                 
+                
+                int maxElevationValue = limitedInputRangeCorrecting(maxElevation.getText(), 1, tmpMax, tmpMax);
+                maxElevation.setText(String.valueOf(maxElevationValue));
+
+                int maxPossiblePeaks = (inputPixels - (2 * maxElevationValue + 2)) * (inputPixels - (2 * maxElevationValue + 2));
+                int numPeaksValue = limitedInputRangeCorrecting(numPeaks.getText(), 1, maxPossiblePeaks, 5);
+                numPeaks.setText(String.valueOf(numPeaksValue));
+
+                if (back1.isSelected()) {
+                    map = new IslandMap(numSquares, distortion, inputPixels, maxElevationValue, numPeaksValue);
+                } else {
+                    map = new TownMap(numSquares, distortion, inputPixels, maxElevationValue, numPeaksValue);
+                }
+
                 loadMap(map, transparentGrid);
             }
         });
@@ -338,7 +347,7 @@ public class Mapper extends javax.swing.JFrame {
         m11.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 String filename = JOptionPane.showInputDialog(null, "Enter filename", "Save as jpg (blue background)", JOptionPane.INFORMATION_MESSAGE);
-                String fullpath = getCurrentDirectoryPath()+filename;
+                String fullpath = getCurrentDirectoryPath() + filename;
                 if ((filename != null) && (!filename.isEmpty())) {
                     mapToJpg(fullpath);
                 }
@@ -348,8 +357,8 @@ public class Mapper extends javax.swing.JFrame {
         //  "Save image as png"
         m12.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                String filename = JOptionPane.showInputDialog(null, "Enter filename", "Save as jpg (blue background)", JOptionPane.INFORMATION_MESSAGE);
-                String fullpath = getCurrentDirectoryPath()+filename;
+                String filename = JOptionPane.showInputDialog(null, "Enter filename", "Save image as png (transparent background)", JOptionPane.INFORMATION_MESSAGE);
+                String fullpath = getCurrentDirectoryPath() + filename;
                 if ((filename != null) && (!filename.isEmpty())) {
                     mapToPng(fullpath);
                 }
@@ -359,8 +368,8 @@ public class Mapper extends javax.swing.JFrame {
 
         m13.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                String filename = JOptionPane.showInputDialog(null, "Enter filename", "Save as jpg (blue background)", JOptionPane.INFORMATION_MESSAGE);
-                String fullpath = getCurrentDirectoryPath()+filename;
+                String filename = JOptionPane.showInputDialog(null, "Enter filename", "Export map as json", JOptionPane.INFORMATION_MESSAGE);
+                String fullpath = getCurrentDirectoryPath() + filename;
                 if ((filename != null) && (!filename.isEmpty())) {
                     mapToJson(fullpath);
                 }
@@ -370,16 +379,15 @@ public class Mapper extends javax.swing.JFrame {
 
         m10.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                String filename = JOptionPane.showInputDialog(null, "Enter filename", "Save as jpg (blue background)", JOptionPane.INFORMATION_MESSAGE);
-                String fullpath = getCurrentDirectoryPath()+filename;
+                String filename = JOptionPane.showInputDialog(null, "Enter filename", "Load map from json", JOptionPane.INFORMATION_MESSAGE);
+                String fullpath = getCurrentDirectoryPath() + filename;
                 if ((filename != null) && (!filename.isEmpty())) {
                     mapFromJson(fullpath);
                 }
             }
         });
-        
+
         ////////////////////// column 2 ////////////////////////
-        
         m21.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 JOptionPane.showMessageDialog(null, "Map Parameters: \n"
@@ -403,13 +411,11 @@ public class Mapper extends javax.swing.JFrame {
                         + "Free for any use, attribution not required but is much appreciated.\n"
                         + "This application may be used as-is, I hold no responsibility if something goes wrong.\nHopefully it won't.\n\n"
                         + "For comments, bug reports, suggestions, or anything else, drop me a line at\nhartoman@gmail.com\n"
-                        + "I hope you guys have as much fun using it, as I had creating it :)", 
-                        
+                        + "I hope you guys have as much fun using it, as I had creating it :)",
                         "About", JOptionPane.ERROR_MESSAGE);
             }
         });
-        
-        
+
         return menu;
 
     }
@@ -422,7 +428,7 @@ public class Mapper extends javax.swing.JFrame {
         try {
             CodeSource codeSource = Mapper.class.getProtectionDomain().getCodeSource();
             File jarFile = new File(codeSource.getLocation().toURI().getPath());
-            jarDir = jarFile.getParentFile().getPath()+"/";
+            jarDir = jarFile.getParentFile().getPath() + "/";
 
         } catch (Exception e) {
             System.out.println("exception or whatever");
@@ -434,7 +440,7 @@ public class Mapper extends javax.swing.JFrame {
     private void mapToJpg(String filename) {
 
         String fullfilename = filename + ".jpg";
-        
+
         // replaced panel.getSize() with map.getSmallerDim(), so that there are no emply 'blue' areas 
         //BufferedImage bi = new BufferedImage(panel.getSize().width, panel.getSize().height, BufferedImage.TYPE_INT_RGB);
         BufferedImage bi = new BufferedImage(map.getSmallerDim(), map.getSmallerDim(), BufferedImage.TYPE_INT_RGB);

@@ -29,7 +29,7 @@ public class Randomizer {
 
     // returns integer between (including) min and max
     public int randomBetween(int min, int max) {
-        return random.nextInt(max - min) + min;
+        return random.nextInt(max +1- min) + min;
     }
 
     // sets a range of numbers between (including) min and max. used for getUniqueInRange

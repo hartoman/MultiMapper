@@ -55,7 +55,7 @@ public class Colorpanel extends javax.swing.JPanel {
         g2d.setComposite(AlphaComposite.Src);
         g2d.setColor(Color.BLUE);
         g2d.fillRect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
-        
+
         ColorizeMap(transparentGrid, map, g);
 
     }
@@ -81,7 +81,7 @@ public class Colorpanel extends javax.swing.JPanel {
         } else {
             cellPerimeter = new Color(0f, 0f, 0f, 1f);
         }
-        
+
         /*      // if true the background is transparent, else color of the sea
         if (transparentBackground == true) {
             background = new Color(0, 180, 204, 0);
@@ -91,11 +91,8 @@ public class Colorpanel extends javax.swing.JPanel {
             //background = new Color(0, 102, 204, 255);
         }
          */
-        
         MapTile[][] maptiles = map.getMap();
         Polygon[][] polys = new Polygon[maptiles.length][maptiles.length];
-
-        
 
         // loads up g2d and selects the first texture of the schema
         Graphics2D g2d = (Graphics2D) g.create();
@@ -108,10 +105,6 @@ public class Colorpanel extends javax.swing.JPanel {
         // ???????????????????????????????????
         // is this necessary?
         // repaint();
-        
-        
-        
-        
         for (int i = 0; i < maptiles.length; i++) {
             for (int j = 0; j < maptiles[0].length; j++) {
                 // draws map grid
@@ -166,7 +159,7 @@ public class Colorpanel extends javax.swing.JPanel {
             }
 
         }
-        System.out.println("mia");
+
     }
 
 }

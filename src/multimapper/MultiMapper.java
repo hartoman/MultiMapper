@@ -21,13 +21,13 @@ public class MultiMapper {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-   
+
         Mapper visual = new Mapper();
         visual.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         visual.setTitle("Island Map Generator");
         visual.setLocationRelativeTo(null);
         visual.setVisible(true);
-        
+
     }
-    
+
 }
