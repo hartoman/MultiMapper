@@ -30,6 +30,10 @@ public abstract class RandMap {
     protected int sizeInPixels;
     protected int distortion;
     protected Randomizer r = new Randomizer();
+    
+    protected Hashtable<String, Integer> tiles;
+
+    
 
     // maxDim = maximum dimensions of the map, distortion = deviation from angle
     public RandMap(int maxDim, int distortion, int sizeInPixels) {
@@ -38,6 +42,9 @@ public abstract class RandMap {
         this.maxDim = maxDim;
         this.sizeInPixels=sizeInPixels;
         this.distortion=distortion;
+        
+        tiles=new Hashtable<>();
+
     }
     
     //returns the map of this object
@@ -60,6 +67,17 @@ public abstract class RandMap {
         return Math.min(maptile[last][last].getXs()[2], maptile[last][last].getYs()[2]);
     }
 
+        // convenience method to input the hashkey with a final string
+    public int stringToHashKey(String texture) {
+        int hashkey = 0;
+        for (int key = 0; key < textureScheme.size(); key++) {
+            if (textureScheme.get(key).equals(texture)) {
+                hashkey = key;
+            }
+        }
+        return hashkey;
+    }
+    
     protected void createGrid() {
         int averageSide = (int) (sizeInPixels / maxDim);
 
@@ -237,6 +255,9 @@ class IslandMap extends RandMap {
         textureScheme.put(5, "dark jungle.jpg");
         textureScheme.put(6, "dark rock.jpg");
         textureScheme.put(7, "light rock.jpg");
+        
+        textureScheme.put(8, "trans.png");
+
     }
     
 
@@ -251,7 +272,8 @@ class TownMap extends RandMap {
     private final String water = "water.jpg";
     private final String plot = "light sand.jpg";
     private final String building = "wood2.jpg";
-    private Hashtable<String, Integer> tiles;
+    
+    
 
     // for defining map limits
     private int top;
@@ -300,7 +322,6 @@ class TownMap extends RandMap {
         right = bottom;
 
         // so as to avoid constant recalculation of the most used strings
-        tiles = new Hashtable<>();
         tiles.put(road, stringToHashKey(road));
         tiles.put(water, stringToHashKey(water));
         tiles.put(plot, stringToHashKey(plot));
@@ -383,14 +404,19 @@ class TownMap extends RandMap {
         textureScheme.put(5, "medium jungle.jpg");
         textureScheme.put(7, "dark jungle.jpg");
         textureScheme.put(6, "light rock.jpg");
-
+        
+        textureScheme.put(8, "trans.png");
     }
+    
+    
     // TODO: FIX MAX ELEVATION
     // TODO: FIX MAX ROADS
 
     // TODO: ADD OPTION FOR SEA     --on the GUI
     // TODO: ADD OPTION FOR RIVER  --on the GUI
     // TODO: ASSIGN DENSITY FACTOR  --on the GUI
+    
+    
     // paints the neighbours of a road tile.
     void paintNeighbors(int x, int y) {
         int value = 1;
@@ -456,16 +482,7 @@ class TownMap extends RandMap {
         return bottom;
     }
 
-    // convenience method to input the hashkey with a final string
-    int stringToHashKey(String texture) {
-        int hashkey = 0;
-        for (int key = 0; key < textureScheme.size(); key++) {
-            if (textureScheme.get(key).equals(texture)) {
-                hashkey = key;
-            }
-        }
-        return hashkey;
-    }
+
 
     // creates a river that runs through the map
     void createRiver(boolean river) {

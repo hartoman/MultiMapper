@@ -55,6 +55,7 @@ public class Mapper extends javax.swing.JFrame {
 
     private RandMap map;
     private boolean transparentGrid = false;
+    private boolean transparentBackground = false;
 
     private final int maxIsleElevation = 7;
     private int maxIslePeaks= 7;
@@ -368,7 +369,15 @@ public class Mapper extends javax.swing.JFrame {
                 String filename = JOptionPane.showInputDialog(null, "Enter filename", "Save image as png (transparent background)", JOptionPane.INFORMATION_MESSAGE);
                 String fullpath = getCurrentDirectoryPath() + filename;
                 if ((filename != null) && (!filename.isEmpty())) {
+                    
+                    transparentBackground = true;
+                    panel.removeAll();
+                    panel.updateUI();
+                    loadMap(map);
                     mapToPng(fullpath);
+                    
+                    transparentBackground = false;
+                    loadMap(map);
                 }
 
             }
@@ -497,7 +506,7 @@ public class Mapper extends javax.swing.JFrame {
 
     public void loadMap(RandMap map) {
         // sets the map, in the panel (method of Colorpanel)
-        this.panel.setMap(map, transparentGrid);
+        this.panel.setMap(map, transparentGrid,transparentBackground);
         //this.inputPixels = map.getPixelsPerSide();    REDUNDANT: map will always get fixed pixels per side based on screen height
     }
 

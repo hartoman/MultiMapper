@@ -31,6 +31,8 @@ public class Colorpanel extends javax.swing.JPanel {
 
     private RandMap map;
     private boolean transparentGrid = false;
+    private boolean transparentBackground = false;
+    private String transparent="trans.png";
     
     private Hashtable<Integer, TexturePaint> textureScheme = new Hashtable<>();
     private BufferedImage bi;
@@ -61,10 +63,11 @@ public class Colorpanel extends javax.swing.JPanel {
     }
 
     // sets a map in the Colorpanel. this method is used by the Mapper's loadMap
-    public void setMap(RandMap map, boolean transGrid) {
+    public void setMap(RandMap map, boolean transGrid,boolean transparentBackground) {
         this.map = map;
         setTextures();
-        transparentGrid = transGrid;
+        this.transparentGrid = transGrid;
+        this.transparentBackground = transparentBackground;
         removeAll();
     }
 
@@ -94,6 +97,9 @@ public class Colorpanel extends javax.swing.JPanel {
         //sets the color of the line perimeter
         g.setColor(cellPerimeter);
 
+        int transparentHashKey = map.stringToHashKey(transparent);
+        
+        
         for (int i = 0; i < maptiles.length; i++) {
             for (int j = 0; j < maptiles[0].length; j++) {
                 // draws map grid
@@ -105,8 +111,12 @@ public class Colorpanel extends javax.swing.JPanel {
 
              //       g.setColor(colorizeTile(maptiles[i][j].getElevation(), background));
               //      g.fillPolygon(polys[i][j]);
-
-                    tmpTexture = textureScheme.get(maptiles[i][j].getElevation());
+                    if((transparentBackground)&&(maptiles[i][j].getElevation()==0)){
+                        tmpTexture = textureScheme.get(transparentHashKey);
+                    }else{
+                        tmpTexture = textureScheme.get(maptiles[i][j].getElevation());
+                    }
+                 //   tmpTexture = textureScheme.get(maptiles[i][j].getElevation());
                     g2d.setPaint(tmpTexture);
                     g2d.fill(polys[i][j]);
 
