@@ -56,8 +56,14 @@ public class Mapper extends javax.swing.JFrame {
     private RandMap map;
     private boolean transparentGrid = false;
 
-    private final int maxPossibleElevationIsland = 7;
-    private final int maxPossibleElevationTown = 7;
+    private final int maxIsleElevation = 7;
+    private int maxIslePeaks= 7;
+    
+    private int maxTownRoads = 7;
+    private final int maxTownDensity = 100;
+    
+    private boolean townHasSea = false;
+    private boolean townHasRiver = false;
     //  boolean transparentBackground = false;
 
     ///////////////////////////////////////////////////////////////////////
@@ -74,13 +80,15 @@ public class Mapper extends javax.swing.JFrame {
         distortion = 3;
         maxElevationValue = 5;
         numPeaksValue = 5;
+        
 
         // gets the maximum screen height   -- the*0.92 is to adjust for lost screen space on linux
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         this.inputPixels = (int) (gd.getDisplayMode().getHeight() * 0.92);
 
         // creates map and visualizes it through the colorpanel
-        this.map = new TownMap(squaresPerSide, distortion, inputPixels, maxElevationValue, numPeaksValue);
+        this.map = new IslandMap(squaresPerSide, distortion, inputPixels, maxElevationValue, numPeaksValue);
+//        this.map = new TownMap(squaresPerSide, distortion, inputPixels, maxElevationValue, numPeaksValue);
 
         // creates the map panel
         panel = new Colorpanel(map);
@@ -203,7 +211,7 @@ public class Mapper extends javax.swing.JFrame {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
 
                     transparentGrid = false;
-                    loadMap(map, transparentGrid);
+                    loadMap(map);
                 }
             }
         });
@@ -217,7 +225,7 @@ public class Mapper extends javax.swing.JFrame {
                     transparentGrid = true;
                     panel.removeAll();
                     panel.updateUI();
-                    loadMap(map, transparentGrid);
+                    loadMap(map);
                 }
             }
         });
@@ -291,9 +299,9 @@ public class Mapper extends javax.swing.JFrame {
 
                 int tmpMax;
                 if (back1.isSelected() == true) {
-                    tmpMax = maxPossibleElevationIsland;
+                    tmpMax = maxIsleElevation;
                 } else {
-                    tmpMax = maxPossibleElevationTown;
+                    tmpMax = maxTownDensity;
                 }
                 
                 
@@ -307,10 +315,10 @@ public class Mapper extends javax.swing.JFrame {
                 if (back1.isSelected()) {
                     map = new IslandMap(numSquares, distortion, inputPixels, maxElevationValue, numPeaksValue);
                 } else {
-                    map = new TownMap(numSquares, distortion, inputPixels, maxElevationValue, numPeaksValue);
+                    map = new TownMap(numSquares, distortion, inputPixels, maxElevationValue, numPeaksValue,true,true);
                 }
 
-                loadMap(map, transparentGrid);
+                loadMap(map);
             }
         });
         uiPane.add(createPanel);
@@ -483,13 +491,13 @@ public class Mapper extends javax.swing.JFrame {
         ArrayList<RandMap> map = new ArrayList<>();
         map = th.loader(map, fullfilename, RandMap.class);
         this.map = map.get(0);
-        loadMap(this.map, this.transparentGrid);
+        loadMap(this.map);
 
     }
 
-    public void loadMap(RandMap map, boolean transGrid) {
+    public void loadMap(RandMap map) {
         // sets the map, in the panel (method of Colorpanel)
-        this.panel.setMap(map, transGrid);
+        this.panel.setMap(map, transparentGrid);
         //this.inputPixels = map.getPixelsPerSide();    REDUNDANT: map will always get fixed pixels per side based on screen height
     }
 

@@ -27,25 +27,19 @@ public abstract class RandMap {
     protected Hashtable<Integer, Color> colorScheme = new Hashtable<>();
     protected Hashtable<Integer, String> textureScheme = new Hashtable<>();
     protected int maxDim;
+    protected int sizeInPixels;
+    protected int distortion;
     protected Randomizer r = new Randomizer();
 
     // maxDim = maximum dimensions of the map, distortion = deviation from angle
-    public RandMap(int maxDim, int distortion, int sizeInPixels, int maxElevation, int maxPeaks) {
+    public RandMap(int maxDim, int distortion, int sizeInPixels) {
 
         this.maptile = new MapTile[maxDim][maxDim];
-        this.maxDim=maxDim;
-        // sets the colorscheme hashtable
-        //  setColorScheme();
-        // sets the texture scheme hashtable
-        setTextureScheme();
-
-        // creates the map grid
-        createGrid(maxDim, distortion, sizeInPixels);
-
-        // sets the starting location for the recursion that sets the elevation
-        setSeed(maxDim, maxElevation, maxPeaks);
+        this.maxDim = maxDim;
+        this.sizeInPixels=sizeInPixels;
+        this.distortion=distortion;
     }
-
+    
     //returns the map of this object
     public MapTile[][] getMap() {
         return this.maptile;
@@ -66,7 +60,7 @@ public abstract class RandMap {
         return Math.min(maptile[last][last].getXs()[2], maptile[last][last].getYs()[2]);
     }
 
-    private void createGrid(int maxDim, int distortion, int sizeInPixels) {
+    protected void createGrid() {
         int averageSide = (int) (sizeInPixels / maxDim);
 
         // initialize maptiles
@@ -149,24 +143,33 @@ public abstract class RandMap {
     protected abstract void setColorScheme();
 
     protected abstract void setTextureScheme();
+    
+    protected abstract void AssignElevation(int elevation, int x, int y);
 
-    protected abstract void setSeed(int maxDim, int maxElevation, int maxPeaks);
-
-    protected abstract void AssignElevation(int maxElevation, int x, int y);
 
 }
 
 // maps for islands
 class IslandMap extends RandMap {
+        protected int maxElevation;
+        protected int maxPeaks;
 
     public IslandMap(int maxDim, int distortion, int sizeInPixels, int maxElevation, int maxPeaks) {
-        super(maxDim, distortion, sizeInPixels, maxElevation, maxPeaks);
-        //  textureFolderPath="IslandMap/";
-    }
+        super(maxDim, distortion, sizeInPixels);
+        this.maxElevation=maxElevation;
+        this.maxPeaks=maxPeaks;
 
+        // sets the texture scheme hashtable
+        setTextureScheme();
+
+        // creates the map grid
+        createGrid();
+        setSeed();
+    }
+   
     // define place for each of the peaks
-    @Override
-    public void setSeed(int maxDim, int maxElevation, int maxPeaks) {
+
+    public void setSeed() {
 
         for (int i = 0; i < maxPeaks; i++) {
 
@@ -186,26 +189,26 @@ class IslandMap extends RandMap {
 
     /* sets elevation for the tiles */
     @Override
-    protected void AssignElevation(int maxElevation, int x, int y) {
+    protected void AssignElevation(int elevation, int x, int y) {
 
-        if (maxElevation > maptile[x][y].getElevation()) {
-            maptile[x][y].setElevation(maxElevation);
+        if (elevation > maptile[x][y].getElevation()) {
+            maptile[x][y].setElevation(elevation);
         }
 
-        if (maxElevation > 0) {
+        if (elevation > 0) {
             boolean axis = r.randomBool();
             // expands on the horizontal-vertical axis
             if (axis == true) {
-                AssignElevation((maxElevation - r.randomBetween(1, 2)), x + 1, y);
-                AssignElevation((maxElevation - r.randomBetween(1, 2)), x - 1, y);
-                AssignElevation((maxElevation - r.randomBetween(1, 2)), x, y + 1);
-                AssignElevation((maxElevation - r.randomBetween(1, 2)), x, y - 1);
+                AssignElevation((elevation - r.randomBetween(1, 2)), x + 1, y);
+                AssignElevation((elevation - r.randomBetween(1, 2)), x - 1, y);
+                AssignElevation((elevation - r.randomBetween(1, 2)), x, y + 1);
+                AssignElevation((elevation - r.randomBetween(1, 2)), x, y - 1);
             } else {
                 //expands on diagonal
-                AssignElevation((maxElevation - r.randomBetween(1, 2)), x + 1, y + 1);
-                AssignElevation((maxElevation - r.randomBetween(1, 2)), x - 1, y - 1);
-                AssignElevation((maxElevation - r.randomBetween(1, 2)), x - 1, y + 1);
-                AssignElevation((maxElevation - r.randomBetween(1, 2)), x + 1, y - 1);
+                AssignElevation((elevation - r.randomBetween(1, 2)), x + 1, y + 1);
+                AssignElevation((elevation - r.randomBetween(1, 2)), x - 1, y - 1);
+                AssignElevation((elevation - r.randomBetween(1, 2)), x - 1, y + 1);
+                AssignElevation((elevation - r.randomBetween(1, 2)), x + 1, y - 1);
             }
         }
     }
@@ -235,6 +238,7 @@ class IslandMap extends RandMap {
         textureScheme.put(6, "dark rock.jpg");
         textureScheme.put(7, "light rock.jpg");
     }
+    
 
 }
 /////////////////////////////////////
@@ -242,35 +246,77 @@ class IslandMap extends RandMap {
 
 class TownMap extends RandMap {
 
-    final String road = "dark sand.jpg";
-    final String water = "water.jpg";
+    // for ease of reference to tile types
+    private final String road = "dark sand.jpg";
+    private final String water = "water.jpg";
+    private final String plot = "light sand.jpg";
+    private final String building = "wood2.jpg";
+    private Hashtable<String, Integer> tiles;
 
-    int top;
-    int left = top;
-    int bottom;
-    int right = bottom;
+    // for defining map limits
+    private int top;
+    private int left = top;
+    private int bottom;
+    private int right = bottom;
 
-    public TownMap(int maxDim, int distortion, int sizeInPixels, int maxElevation, int maxPeaks) {
-        super(maxDim, distortion, sizeInPixels, maxElevation, maxPeaks);
+    // density of the buildings
+    private int density;
+    private int numRoads;
+    private boolean sea;
+    private boolean river;
 
+    // here: distortion is always 0-3
+    // maxElevation represents building density 0-100
+    // numRoads is the number of horizontal roads
+    public TownMap(int maxDim, int distortion, int sizeInPixels, int density , int numRoads,boolean sea,boolean river) {
+        super(maxDim, distortion, sizeInPixels);
+
+        this.density=density;
+        this.numRoads=numRoads;
+        this.sea=sea;
+        this.river=river;
+
+        // sets the texture scheme hashtable
+        setTextureScheme();
+
+        // creates the map grid
+        createGrid();
+        
+        // configures the initial assisting variables
+        initVariables();
+        
+        // creates the map    
+        setSeed();
+        
     }
 
-    // define place for each of the peaks
-    @Override
-    public void setSeed(int maxDim, int maxElevation, int maxPeaks) {
-
+    //sets up the initial assisting variables
+    protected void initVariables(){
+        
         // the available area for the town limits
         top = maxDim / 5;
         left = top;
         bottom = maxDim * 4 / 5;
         right = bottom;
 
-        
-        createRiver();
-        
-        
+        // so as to avoid constant recalculation of the most used strings
+        tiles = new Hashtable<>();
+        tiles.put(road, stringToHashKey(road));
+        tiles.put(water, stringToHashKey(water));
+        tiles.put(plot, stringToHashKey(plot));
+        tiles.put(building, stringToHashKey(building));
+    };
+    
+
+    
+    public void setSeed() {
+
+        // creates a river if the input boolean is true
+        createRiver(river);
+
         // lays down the first main horizontal road
-        roadHoriz(bottom, left, right);
+        int mid = (right-left)/2;
+        roadHoriz(bottom, r.randomBetween(left,mid-1), r.randomBetween(mid+1,right));
 
         // every town has at least one road
         int roadCount = 1;
@@ -282,7 +328,7 @@ class TownMap extends RandMap {
 
             //spawns points for the following roads
             int x = r.randomBetween(left + 1, right - 1);
-            maptile[i][x].setElevation(maxElevation);
+            maptile[i][x].setElevation(tiles.get(road));
 
             // draws horizontal road based on this point
             roadHoriz(i, r.randomBetween(left, x), x);
@@ -290,11 +336,11 @@ class TownMap extends RandMap {
 
             // draws vertical roads. on the road going downwards care is taken so as to connect all roads
             roadVert(x, r.randomBetween(top, i), i);
-            roadVert(x, i, minToConnect(x, i, bottom, maxElevation));
+            roadVert(x, i, minToConnect(x, i, bottom));
 
             // how many roads we have. we always have at least 1
             roadCount++;
-            if (roadCount + 1 > maxPeaks) {
+            if (roadCount + 1 > numRoads) {
                 startPointY = i;
                 startPointX = x;
                 break;
@@ -302,12 +348,9 @@ class TownMap extends RandMap {
             }
         }
 
-        // if there is sea
-        for (int i = bottom + 3; i < maxDim; i++) {
-            for (int j = 0; j < maxDim; j++) {
-                maptile[i][j].setElevation(stringToHashKey(water));
-            }
-        }
+        // creates a river if the input boolean is true
+        createSea(sea);
+
     }
 
     /* sets elevation for the tiles */
@@ -337,7 +380,6 @@ class TownMap extends RandMap {
         // roads
         textureScheme.put(3, "dark sand.jpg");
 
-        
         textureScheme.put(5, "medium jungle.jpg");
         textureScheme.put(7, "dark jungle.jpg");
         textureScheme.put(6, "light rock.jpg");
@@ -346,12 +388,10 @@ class TownMap extends RandMap {
     // TODO: FIX MAX ELEVATION
     // TODO: FIX MAX ROADS
 
-    // TODO: ADD OPTION FOR SEA
-    // TODO: ADD OPTION FOR RIVER -- MUST HAVE SEA??
+    // TODO: ADD OPTION FOR SEA     --on the GUI
+    // TODO: ADD OPTION FOR RIVER  --on the GUI
+    // TODO: ASSIGN DENSITY FACTOR  --on the GUI
     // paints the neighbours of a road tile.
-    
-    
-        // TODO: ASSIGN DENSITY FACTOR
     void paintNeighbors(int x, int y) {
         int value = 1;
         for (int i = x - 2; i < x + 3; i++) {
@@ -361,24 +401,14 @@ class TownMap extends RandMap {
                     // builing is 2
                     // empty plot is 1
                     // the higher the max of randombetween, the less densely populated the city is
-                    value = r.randomBetween(1, 4);
-                    if (value != 2) {
-                        value = 1;
+                    value = r.randomBetween(1, 100);
+                    if (value < density) {
+                        value = tiles.get(building);
+                    } else {
+                        value = tiles.get(plot);
                     }
                     maptile[i][j].setElevation(Math.max(maptile[i][j].getElevation(), value));
-                    
-                /*    
-                    if (value==2){
-                        for (int k = i - 1; k < i + 2; k++) {
-                            for (int l = j - 1; l < j + 2; l++) {
-                     
-                                        maptile[k][l].setElevation(Math.max(maptile[k][l].getElevation(),1));
 
-                                }
-                            }
-                        }
-                    */
-                    
                 }
             }
         }
@@ -389,7 +419,7 @@ class TownMap extends RandMap {
         Randomizer r = new Randomizer();
 
         for (int i = left; i < right + 1; i++) {
-            maptile[y][i].setElevation(stringToHashKey(road));
+            maptile[y][i].setElevation(tiles.get(road));
             //paints the neighbors of this road tile
             paintNeighbors(y, i);
         }
@@ -399,7 +429,7 @@ class TownMap extends RandMap {
     void roadVert(int x, int top, int bottom) {
 
         for (int i = top; i < bottom + 1; i++) {
-            maptile[i][x].setElevation(stringToHashKey(road));
+            maptile[i][x].setElevation(tiles.get(road));
             //paints the neighbors of this road tile
             paintNeighbors(i, x);
         }
@@ -408,12 +438,20 @@ class TownMap extends RandMap {
     // returns the minimum line length that is needed to connect a horizontal road A
     // with the next road beneath B
     // x and y are coordinates of a junction point of road A
-    int minToConnect(int x, int y, int bottom, int maxElevation) {
-
+    int minToConnect(int x, int y, int bottom) {
+        
+        // search for a road to connect to
         for (int i = y + 1; i < bottom; i++) {
-            if (maptile[i][x].getElevation() == maxElevation) {
+            if (maptile[i][x].getElevation() == tiles.get(road)) {
                 return i;
             }
+        }
+        // if reached bottom and no road is found yet, extend first road. the x+/-1 is added to make it look more natural than just a corner
+        int mid = (right-left)/2;
+        if(x<mid){
+            roadHoriz(bottom,x+2,mid-1);
+        }else{
+            roadHoriz(bottom,mid+1,x+2);
         }
         return bottom;
     }
@@ -430,22 +468,38 @@ class TownMap extends RandMap {
     }
 
     // creates a river that runs through the map
-    void createRiver(){
-        int beginpoint = r.randomBetween(0, maxDim-1);
-        maptile[0][beginpoint].setElevation(stringToHashKey(water));
-        int currentX = beginpoint;
-        int xWithinLimits=currentX;
-        int xWithinLimits2=currentX;
+    void createRiver(boolean river) {
         
-        for(int i=1;i<maxDim;i++){
+        if (river){
+            int beginpoint = r.randomBetween(0, maxDim - 1);
+        maptile[0][beginpoint].setElevation(tiles.get(water));
+        int currentX = beginpoint;
+        int xWithinLimits = currentX;
+        int xWithinLimits2 = currentX;
+
+        for (int i = 1; i < maxDim; i++) {
             currentX += r.randomBetween(-1, 1);
-            xWithinLimits=Math.max(0, Math.min(currentX, maxDim-1));
-            
-            maptile[i][xWithinLimits].setElevation(stringToHashKey(water));
-            
-            
-            xWithinLimits2=Math.max(0, Math.min(xWithinLimits+1, maxDim-1));
-            maptile[i][xWithinLimits2].setElevation(stringToHashKey(water));
+            xWithinLimits = Math.max(0, Math.min(currentX, maxDim - 1));
+            maptile[i][xWithinLimits].setElevation(tiles.get(water));
+
+            // river has 2 squares to look nice, else it looks like a stream
+            xWithinLimits2 = Math.max(0, Math.min(xWithinLimits + 1, maxDim - 1));
+            maptile[i][xWithinLimits2].setElevation(tiles.get(water));
         }
+        }
+        
     }
+
+    void createSea(boolean sea) {
+
+        if (sea) {
+            for (int i = bottom + 3; i < maxDim; i++) {
+                for (int j = 0; j < maxDim; j++) {
+                    maptile[i][j].setElevation(tiles.get(water));
+                }
+            }
+        }
+
+    }
+
 }

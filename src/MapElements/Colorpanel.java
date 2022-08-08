@@ -31,7 +31,7 @@ public class Colorpanel extends javax.swing.JPanel {
 
     private RandMap map;
     private boolean transparentGrid = false;
-
+    
     private Hashtable<Integer, TexturePaint> textureScheme = new Hashtable<>();
     private BufferedImage bi;
 
@@ -69,9 +69,10 @@ public class Colorpanel extends javax.swing.JPanel {
     }
 
     // colorizes the entire map
-    public void ColorizeMap(boolean transparentGrid, RandMap map, Graphics g) {
+    public void ColorizeMap(boolean transparentGrid,RandMap map, Graphics g) {
         Color cellPerimeter = new Color(0f, 0f, 0f, 0f);
-        Color background = new Color(0f, 0f, 0f, 0f);
+        
+        Color background = new Color(0, 180, 204, 0);
 
         // if true, then cell perimeter is transparent, else is black
         // 0f: makes grid invisible
@@ -82,15 +83,6 @@ public class Colorpanel extends javax.swing.JPanel {
             cellPerimeter = new Color(0f, 0f, 0f, 1f);
         }
 
-        /*      // if true the background is transparent, else color of the sea
-        if (transparentBackground == true) {
-            background = new Color(0, 180, 204, 0);
-
-        } else {
-            background = map.getColorScheme().get(0);
-            //background = new Color(0, 102, 204, 255);
-        }
-         */
         MapTile[][] maptiles = map.getMap();
         Polygon[][] polys = new Polygon[maptiles.length][maptiles.length];
 
@@ -102,9 +94,6 @@ public class Colorpanel extends javax.swing.JPanel {
         //sets the color of the line perimeter
         g.setColor(cellPerimeter);
 
-        // ???????????????????????????????????
-        // is this necessary?
-        // repaint();
         for (int i = 0; i < maptiles.length; i++) {
             for (int j = 0; j < maptiles[0].length; j++) {
                 // draws map grid
@@ -112,25 +101,25 @@ public class Colorpanel extends javax.swing.JPanel {
                 g.drawPolygon(polys[i][j]);
 
                 // colorizes the map
-                g.setColor(colorizeTile(maptiles[i][j].getElevation(), background));
 
-                g.fillPolygon(polys[i][j]);
-                tmpTexture = textureScheme.get(maptiles[i][j].getElevation());
-                g2d.setPaint(tmpTexture);
-                g2d.fill(polys[i][j]);
+
+             //       g.setColor(colorizeTile(maptiles[i][j].getElevation(), background));
+              //      g.fillPolygon(polys[i][j]);
+
+                    tmpTexture = textureScheme.get(maptiles[i][j].getElevation());
+                    g2d.setPaint(tmpTexture);
+                    g2d.fill(polys[i][j]);
 
                 // to return to default background color after square with higher elevation occurs
                 g.setColor(cellPerimeter);
             }
         }
 
-        /**/
         g.dispose();
     }
 
     // sets the rules for the color of one single tile based on its elevation value
     private Color colorizeTile(int elevation, Color background) {
-        //   Color color = new Color(0, 0, 0, 0);
 
         if (map.getColorScheme().containsKey(elevation)) {
             return map.getColorScheme().get(elevation);
