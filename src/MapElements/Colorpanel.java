@@ -128,16 +128,6 @@ public class Colorpanel extends javax.swing.JPanel {
         g.dispose();
     }
 
-    // sets the rules for the color of one single tile based on its elevation value
-    private Color colorizeTile(int elevation, Color background) {
-
-        if (map.getColorScheme().containsKey(elevation)) {
-            return map.getColorScheme().get(elevation);
-        } else {
-            return background;
-        }
-    }
-
     private void setTextures() {
 
         TexturePaint tmpTexture;
