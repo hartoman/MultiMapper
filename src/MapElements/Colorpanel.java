@@ -81,7 +81,7 @@ public class Colorpanel extends javax.swing.JPanel {
         // 0f: makes grid invisible
         // 1f: makes opaque grid
         if (transparentGrid == true) {
-            cellPerimeter = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+            cellPerimeter = new Color(0.5f, 0.5f, 0.5f, 0.0f);
         } else {
             cellPerimeter = new Color(0f, 0f, 0f, 1f);
         }
@@ -108,15 +108,11 @@ public class Colorpanel extends javax.swing.JPanel {
 
                 // colorizes the map
 
-
-             //       g.setColor(colorizeTile(maptiles[i][j].getElevation(), background));
-              //      g.fillPolygon(polys[i][j]);
                     if((transparentBackground)&&(maptiles[i][j].getElevation()==0)){
                         tmpTexture = textureScheme.get(transparentHashKey);
                     }else{
                         tmpTexture = textureScheme.get(maptiles[i][j].getElevation());
                     }
-                 //   tmpTexture = textureScheme.get(maptiles[i][j].getElevation());
                     g2d.setPaint(tmpTexture);
                     g2d.fill(polys[i][j]);
 

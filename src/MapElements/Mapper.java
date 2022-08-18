@@ -9,6 +9,7 @@ hartoman@gmail.com
  */
 package MapElements;
 
+import Toolz.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Component;
@@ -67,9 +68,10 @@ public class Mapper extends javax.swing.JFrame {
 
     private boolean townHasSea = false;
     private boolean townHasRiver = false;
-    private boolean townHasCastle= false;
+    private boolean townHasCastle = false;
 
     private String chosenTextureScheme;
+    private String mapType;
 
     ///////////////////////////////////////////////////////////////////////
     public Mapper() {
@@ -85,15 +87,15 @@ public class Mapper extends javax.swing.JFrame {
         distortion = 2;
         maxElevationValue = 8;
         numPeaksValue = 50;
-        chosenTextureScheme= "Islands";
+        chosenTextureScheme = "Islands";
+        mapType = "Landscape";
 
         // gets the maximum screen height   -- the*0.92 is to adjust for lost screen space on linux
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         this.inputPixels = (int) (gd.getDisplayMode().getHeight() * 0.92);
 
         // creates map and visualizes it through the colorpanel
-        this.map = new IslandMap(squaresPerSide, distortion, inputPixels,chosenTextureScheme, maxElevationValue, numPeaksValue);
-
+        this.map = new IslandMap(squaresPerSide, distortion, inputPixels, chosenTextureScheme, maxElevationValue, numPeaksValue);
 
         // creates the map panel
         panel = new Colorpanel(map);
@@ -333,7 +335,7 @@ public class Mapper extends javax.swing.JFrame {
                 }
             }
         });
-        
+
         JCheckBox castleBox = new JCheckBox("Castle");
         castleBox.setSelected(false);
         castleBox.addItemListener(new java.awt.event.ItemListener() {
@@ -347,8 +349,7 @@ public class Mapper extends javax.swing.JFrame {
                 }
             }
         });
-        
-        
+
         townOptionsPanel.add(seaBox);
         townOptionsPanel.add(riverBox);
         townOptionsPanel.add(castleBox);
@@ -453,12 +454,12 @@ public class Mapper extends javax.swing.JFrame {
                     maxElevationValue = Math.min((squaresPerSide - 3) / 2, maxIsleElevation);
                     maxPossiblePeaks = (inputPixels - (2 * maxElevationValue + 2)) * (inputPixels - (2 * maxElevationValue + 2));
                 } else {
-                    if (townHasCastle){
+                    if (townHasCastle) {
                         squaresPerSide = limitedInputRangeCorrecting(squares.getText(), 20, maxSquaresPerSide, 50);
-                    }else{
+                    } else {
                         squaresPerSide = limitedInputRangeCorrecting(squares.getText(), 11, maxSquaresPerSide, 50);
                     }
-                    
+
                     maxElevationValue = maxTownDensity;
                     maxPossiblePeaks = squaresPerSide / 5;
                 }
@@ -476,9 +477,11 @@ public class Mapper extends javax.swing.JFrame {
                 numPeaks.setText(String.valueOf(numPeaksValue));
 
                 if (back1.isSelected()) {
-                    map = new IslandMap(squaresPerSide, distortion, inputPixels, chosenTextureScheme,maxElevationValue, numPeaksValue);
+                    map = new IslandMap(squaresPerSide, distortion, inputPixels, chosenTextureScheme, maxElevationValue, numPeaksValue);
+                    mapType = "Landscape";
                 } else {
-                    map = new TownMap(squaresPerSide, distortion, inputPixels,chosenTextureScheme, maxElevationValue, numPeaksValue, townHasSea, townHasRiver,townHasCastle);
+                    map = new TownMap(squaresPerSide, distortion, inputPixels, chosenTextureScheme, maxElevationValue, numPeaksValue, townHasSea, townHasRiver, townHasCastle);
+                    mapType = "Settlement";
                 }
 
                 loadMap(map);
@@ -496,6 +499,7 @@ public class Mapper extends javax.swing.JFrame {
         // first columne
         JMenu column1 = new JMenu("Import/Export");
         JMenuItem m10 = new JMenuItem("Load map from json");
+        //  m10.setEnabled(false);
         JMenuItem m13 = new JMenuItem("Export map as json");
         JMenuItem m11 = new JMenuItem("Save image as jpg");
         JMenuItem m12 = new JMenuItem("Save image as png (transparent background)");
@@ -548,9 +552,9 @@ public class Mapper extends javax.swing.JFrame {
         m13.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 String filename = JOptionPane.showInputDialog(null, "Enter filename", "Export map as json", JOptionPane.INFORMATION_MESSAGE);
-                String fullpath = getCurrentDirectoryPath() + filename;
+
                 if ((filename != null) && (!filename.isEmpty())) {
-                    mapToJson(fullpath);
+                    mapToJson(filename);
                 }
 
             }
@@ -559,9 +563,9 @@ public class Mapper extends javax.swing.JFrame {
         m10.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 String filename = JOptionPane.showInputDialog(null, "Enter filename", "Load map from json", JOptionPane.INFORMATION_MESSAGE);
-                String fullpath = getCurrentDirectoryPath() + filename;
+                //   String fullpath = getCurrentDirectoryPath() + filename;
                 if ((filename != null) && (!filename.isEmpty())) {
-                    mapFromJson(fullpath);
+                    mapFromJson(filename);
                 }
             }
         });
@@ -646,19 +650,43 @@ public class Mapper extends javax.swing.JFrame {
     // exports map data as json file
     private void mapToJson(String filename) {
         JsonHandler th = new JsonHandler();
-        String fullfilename = filename + ".json";
-        ArrayList<RandMap> map = new ArrayList<>();
-        map.add(this.map);
-        th.replacer(map, fullfilename);
+
+        if (mapType == "Landscape") {
+            String fullfilename = getCurrentDirectoryPath() + "LAND-" + filename + ".json";
+            ArrayList<IslandMap> map = new ArrayList<>();
+            IslandMap tmpmap = (IslandMap) this.map;
+            map.add(tmpmap);
+            th.replacer(map, fullfilename);
+        } else {
+            String fullfilename = getCurrentDirectoryPath() + "TOWN-" + filename + ".json";
+            ArrayList<TownMap> map = new ArrayList<>();
+            TownMap tmpmap = (TownMap) this.map;
+            map.add(tmpmap);
+            th.replacer(map, fullfilename);
+        }
+
     }
 
     // imports map data from json file
     private void mapFromJson(String filename) {
         JsonHandler th = new JsonHandler();
-        String fullfilename = filename + ".json";
-        ArrayList<RandMap> map = new ArrayList<>();
-        map = th.loader(map, fullfilename, RandMap.class);
-        this.map = map.get(0);
+
+        if (filename.startsWith("LAND-")) {
+            String fullfilename = getCurrentDirectoryPath() + filename + ".json";
+            ArrayList<IslandMap> map = new ArrayList<>();
+            map = th.loader(map, fullfilename, IslandMap.class);
+            this.map = map.get(0);
+            mapType = "Landscape";
+        }
+        if (filename.startsWith("TOWN-")) {
+            String fullfilename = getCurrentDirectoryPath() + filename + ".json";
+            ArrayList<TownMap> map = new ArrayList<>();
+            map = th.loader(map, fullfilename, TownMap.class);
+            this.map = map.get(0);
+            mapType = "Settlement";
+        }
+        panel.removeAll();
+        panel.updateUI();
         loadMap(this.map);
 
     }

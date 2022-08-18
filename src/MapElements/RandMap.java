@@ -9,6 +9,7 @@ hartoman@gmail.com
  */
 package MapElements;
 
+import Toolz.*;
 import java.awt.Color;
 import java.lang.Math;
 import java.awt.Dimension;
