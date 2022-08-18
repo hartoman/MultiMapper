@@ -215,9 +215,10 @@ public class Mapper extends javax.swing.JFrame {
             On the contrary, actionEventListener, fires every time there's a click*/
             public void itemStateChanged(java.awt.event.ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
+                    
+                    transparentGrid = false;
                     panel.removeAll();
                     panel.updateUI();
-                    transparentGrid = false;
                     loadMap(map);
                 } else {
                     transparentGrid = true;
@@ -586,7 +587,7 @@ public class Mapper extends javax.swing.JFrame {
         });
         m22.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                JOptionPane.showMessageDialog(null, "Random Map Generator v_1.1\n\n"
+                JOptionPane.showMessageDialog(null, "Random Map Generator v_1.2\n\n"
                         + "is made by Christos Chartomatsidis, 2022.\n"
                         + "Free for any use, attribution not required but is much appreciated.\n"
                         + "This application may be used as-is, I hold no responsibility if something goes wrong.\nHopefully it won't.\n\n"
