@@ -48,7 +48,7 @@ The Themes for Landscape are:
  
 #### Settlement
 
-Settlement Maps are created by connecting horizontal streets with vertical ones. Around every street, there are both buildings and empty plot tiles.
+Settlement Maps are created by creating horizontal streets which are connecting by vertical ones. Around every street, there are both buildings and empty plot tiles.
 The user may define the number of horizontal streets, and the density of the buildings.
 In Settlement maps there are three extra optional features: the presence of seashore, a river and a castle that surrounds the town. 
 A lot of imperfections have been left on purpose, to make the map more believable- they can be attributed to poor city planning or cutting corners during the construction.
@@ -56,7 +56,7 @@ A lot of imperfections have been left on purpose, to make the map more believabl
 The Themes for Settlement are: 
 
 * Village, medieval fantasy-style, surrounded by lush forest.
-* Post-Apoc, after-the-nukes settlement where the buildings are mare from rusted metal sheets, the fortifications are made from serrated scrap metal and all water is black from the radiation and the toxic waste.
+* Post-Apoc, after-the-nukes settlement where the buildings are made from rusted metal sheets, the fortifications are made from serrated scrap metal and all water is black from the radiation and the toxic waste.
 * Dark Urban, a megalopolis of cold, glass skyscapers, in the middle of a gloomy nowhere.
 
 
@@ -75,9 +75,9 @@ Same as with jpg, but the background tiles are transparent.
 #### to-and-from .JSON
 
 Saves the raw map data in a json file, which can be loaded at a later time.
-In order to properly load a json file, take note of the following:
+In order to properly load a json file, note the following:
 The json must be in the folder from where the application is running.
-Landscape map names MUST begin with "LAND-" and Settlement map names MUST begin with "TOWN-". Removing this prefixes will result in the map becoming unloadable.
+Landscape map names MUST begin with "LAND-" and Settlement map names MUST begin with "TOWN-". Removing these prefixes will result in the map becoming unloadable.
 
 
 ## Technical Support
