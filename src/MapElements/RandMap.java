@@ -10,13 +10,7 @@ hartoman@gmail.com
 package MapElements;
 
 import Toolz.*;
-import java.awt.Color;
-import java.lang.Math;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Polygon;
-import java.util.Hashtable;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -25,14 +19,12 @@ import java.util.ArrayList;
 public abstract class RandMap {
 
     protected MapTile[][] maptile;
-    protected Hashtable<Integer, String> textureScheme = new Hashtable<>();
+    protected TextureScheme textureScheme;
     protected int maxDim;
     protected int sizeInPixels;
     protected int distortion;
     protected Randomizer r = new Randomizer();
-
-    protected Hashtable<String, Integer> tiles;
-
+    protected HashMap<String, Integer> tiles;
     protected String textureSchemeName = "default";
     
 
@@ -44,16 +36,17 @@ public abstract class RandMap {
         this.sizeInPixels = sizeInPixels;
         this.distortion = distortion;
         this.textureSchemeName=textureSchemeName;
-        tiles = new Hashtable<>();
+        tiles = new HashMap<>();
 
     }
 
-    //returns the map of this object
+    // returns the map of this object
     public MapTile[][] getMap() {
         return this.maptile;
     }
-
-    public Hashtable<Integer, String> getTextureScheme() {
+    
+    // gets this map's texture scheme
+    public HashMap<Integer, String> getTextureScheme() {
         return this.textureScheme;
     }
 
@@ -74,6 +67,8 @@ public abstract class RandMap {
         return hashkey;
     }
 
+    // creates grid of tiles that INCLUDE distortion.
+    // if they didn't, we could just use rectangles
     protected void createGrid() {
         int averageSide = (int) (sizeInPixels / maxDim);
 
@@ -230,56 +225,23 @@ class IslandMap extends RandMap {
 
         switch (textureSchemeName) {
             
-            
-// POSTAPOCALYPTIC SET
+            // POSTAPOCALYPTIC SET
             case "Wasteland":
-
-
-                textureScheme.put(0, "wBasic.jpg");
-                
-                textureScheme.put(1, "wPlot.jpg");
-                textureScheme.put(2, "light rock2.jpg");
-                textureScheme.put(5, "wRoad.jpg");
-                textureScheme.put(3, "light sand2.jpg");
-                textureScheme.put(4, "dark sand.jpg");
-                textureScheme.put(6, "dark rock.jpg");
-                textureScheme.put(7, "uBasic.jpg");
-
+                textureScheme = new WastelandScheme();
                 break;
-                
 
-// DARK URBAN SET
+            // DARK URBAN SET
             case "Space":
-
-                textureScheme.put(0, "sBasic.jpg");
-                textureScheme.put(4, "s1.jpg");
-                textureScheme.put(1, "s2.jpg");
-                textureScheme.put(2, "s3.jpg");
-                textureScheme.put(3, "s4.jpg");
-                textureScheme.put(5, "s5.jpg");
-                textureScheme.put(6, "s6.jpg");
-                textureScheme.put(7, "s7.jpg");
+                textureScheme = new SpaceScheme();
                 break;
 
-                
- // DEFAULT SET: ISLANDS               
+            // DEFAULT SET: ISLANDS               
             default:
+                textureScheme = new IslandScheme();
 
-        textureScheme.put(0, "water.jpg");
-        textureScheme.put(1, "light sand.jpg");
-        textureScheme.put(2, "dark sand.jpg");
-        textureScheme.put(3, "light jungle.jpg");
-        textureScheme.put(4, "medium jungle.jpg");
-        textureScheme.put(5, "dark jungle.jpg");
-        textureScheme.put(6, "dark rock.jpg");
-        textureScheme.put(7, "light rock.jpg");
         }
 
-// IMPORTANT!!!
-// must be included in every texture set, otherwise "export as png" function will NOT work
-        textureScheme.put(8, "trans.png");
     }
-
 }
 
 /////////////////////////////////////
@@ -394,85 +356,35 @@ class TownMap extends RandMap {
 
     }
 
+    
 // sets the texture scheme of the map
     @Override
     protected void setTextureScheme() {
 
         switch (textureSchemeName) {
-            
-            
+                        
 // POSTAPOCALYPTIC SET
             case "Post-Apoc":
-
-                road = "wRoad.jpg";
-                water = "wWater.jpg";
-                plot = "wBasic.jpg";
-                building = "wBuild.jpg";
-
-                textureScheme.put(0, "wBasic.jpg");
-                textureScheme.put(4, "wWater.jpg");
-                textureScheme.put(1, "wBasic.jpg");
-                textureScheme.put(2, "wBuild.jpg");
-                textureScheme.put(3, "wRoad.jpg");
-                textureScheme.put(5, "wCastle.jpg");
-                textureScheme.put(6, "wShrub1.jpg");
-                textureScheme.put(7, "wShrub2.jpg");
-
+                textureScheme = new PostApocScheme();
                 break;
                 
-
 // DARK URBAN SET
             case "Dark Urban":
-
-                road = "uRoad.jpg";
-                water = "uWater.jpg";
-                plot = "dark rock.jpg";
-                building = "uBuild.jpg";
-
-                textureScheme.put(0, "uBasic.jpg");
-                textureScheme.put(4, "uWater.jpg");
-                textureScheme.put(1, "dark rock.jpg");
-                textureScheme.put(2, "uBuild.jpg");
-                textureScheme.put(3, "uRoad.jpg");
-                textureScheme.put(5, "uCastle.jpg");
-                 textureScheme.put(6, "dark jungle.jpg");
-                textureScheme.put(7, "wWater.jpg");
+                textureScheme= new DarkUrbanScheme();
                 break;
-
                 
 // DEFAULT SET: FANTASY TOWN               
             default:
-
-// for convenience, the more important tiles are marked here
-                road = "dark sand.jpg";
-                water = "water.jpg";
-                plot = "light sand.jpg";
-                building = "wood2.jpg";
-
-// basic land tile
-                textureScheme.put(0, "light jungle.jpg");
-// water tiles
-                textureScheme.put(4, "water.jpg");
-// the basic stuff of the map
-                //empty plot
-                textureScheme.put(1, "light sand.jpg");
-                //buildings
-                textureScheme.put(2, "wood2.jpg");
-                // roads
-                textureScheme.put(3, "dark sand.jpg");
-// castle walls
-                textureScheme.put(5, "castle.jpg");
-// for the random schrubbery        
-                textureScheme.put(6, "shrub1.jpg");
-                textureScheme.put(7, "shrub2.jpg");
-
+                textureScheme= new FantasyTownScheme();
         }
-
-// IMPORTANT!!!
-// must be included in every texture set, otherwise "export as png" function will NOT work
-        textureScheme.put(8, "trans.png");
+        
+        TownTextureScheme tmpScheme =(TownTextureScheme)textureScheme;    
+         road = tmpScheme.getRoad();
+         water = tmpScheme.getWater();
+         plot = tmpScheme.getPlot();
+         building = tmpScheme.getBuilding();
     }
-
+    
 // paints the neighbours of a road tile.
     void paintNeighbors(int x, int y) {
         int value = 1;
@@ -647,4 +559,5 @@ class TownMap extends RandMap {
         }
 
     }
+    
 }

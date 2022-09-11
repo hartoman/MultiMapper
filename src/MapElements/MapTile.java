@@ -26,6 +26,7 @@ public class MapTile {
 
     }
 
+    // sets the X and Y points for each of the 4 corners of each polygon cell that represents a tile
     public void setPointX(int num, int value) {
 
         this.Xs[num] = value;
@@ -35,7 +36,8 @@ public class MapTile {
 
         this.Ys[num] = value;
     }
-
+    
+    // gets the full array of Xs and Ys of the map
     public int[] getXs() {
         return this.Xs;
     }
@@ -44,6 +46,7 @@ public class MapTile {
         return this.Ys;
     }
 
+    // sets the elevation for a tile
     public void setElevation(int elevation) {
         this.elevation = elevation;
     }
@@ -52,6 +55,7 @@ public class MapTile {
         return this.elevation;
     }
 
+    // easily get number of each number-array representing corresponding corner of a polygon
     enum corners {
         topLeft(1),
         topRight(2),

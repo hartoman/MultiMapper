@@ -6,7 +6,7 @@
  * For any comments, bug-reports, and ideas do not hesitate to contact me at:
  * hartoman@gmail.com
  */
-package multimapper;
+package MultiMapper;
 
 import javax.swing.JFrame;
 import MapElements.*;

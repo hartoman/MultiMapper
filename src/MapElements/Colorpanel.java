@@ -22,19 +22,23 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
+import javax.swing.*;
+import java.util.HashMap;
 
 /**
  *
  * @author chris
  */
-public class Colorpanel extends javax.swing.JPanel {
+
+// this panel is the drawing surface for the map
+public class Colorpanel extends JPanel {
 
     private RandMap map;
     private boolean transparentGrid = false;
     private boolean transparentBackground = false;
     private String transparent="trans.png";
     
-    private Hashtable<Integer, TexturePaint> textureScheme = new Hashtable<>();
+    private HashMap<Integer, TexturePaint> textureScheme = new HashMap<>();
     private BufferedImage bi;
 
     public Colorpanel(RandMap map) {
@@ -107,7 +111,6 @@ public class Colorpanel extends javax.swing.JPanel {
                 g.drawPolygon(polys[i][j]);
 
                 // colorizes the map
-
                     if((transparentBackground)&&(maptiles[i][j].getElevation()==0)){
                         tmpTexture = textureScheme.get(transparentHashKey);
                     }else{
@@ -124,6 +127,7 @@ public class Colorpanel extends javax.swing.JPanel {
         g.dispose();
     }
 
+    // gets the texture scheme that is embedded in the map, and loads the texture cache with the corresponding textures
     private void setTextures() {
 
         TexturePaint tmpTexture;
