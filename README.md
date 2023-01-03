@@ -9,13 +9,15 @@ Besides this library, the rest is made by Christos Chartomatsidis, 2022.
 This program may be freely distributed and used, but is handed as-is.
 There is no copyright, and attribution is not required, but it would be really nice if given.
 
-
 ## Purpose
 
 MultiMapper is a tool that generates simple, low-detail maps.
 A Game-Master (GM) can use these to create locations and settings for his pen-and-paper RPG campaign / boardgame on the spot .
 The stand-alone classes can also be implemented in a computer game, to procedurally create content (i.e. for roguelike games).
 
+## Post-Production Note (added Jan 2023)
+
+MultiMapper was my first personal project in OOP, when I was not yet familiar with many of the OOP-design principles, such as SRP, code maintainability, good and bad coding practices etc. Because of this, I made a lot of mistakes structure-wise, ending up with an application that is very very difficult to maintain and expand. This is the toll of self-teaching: making mistakes and learning (painfully) from them. Nevertheless, I am very proud of the end result, and I intend to re-create this idea from scratch in the future, only better.
 
 ## How to use
 
