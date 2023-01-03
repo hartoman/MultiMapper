@@ -21,6 +21,11 @@ MultiMapper was my first personal project in OOP, when I was not yet familiar wi
 
 ## How to use
 
+### How to run
+
+In the folder MultiMapper.zip there is an executable .jar file and the 'lib' folder which contains the libraries needed. Just unzip in the same folder.
+To run the application you need to have Java JRE installed in your system.
+
 ### Defining Parameters
 
 There are two types of maps that can be generated: Landscape and Settlement.
